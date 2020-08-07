@@ -13,6 +13,8 @@ cd docs/.vuepress/dist
 echo 'waterfly.work' > CNAME
 
 git init
+git config user.name waterfly
+git config user.email yiyeff@gmail.com
 git add -A
 git commit -m 'deploy'
 
