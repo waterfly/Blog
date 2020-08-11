@@ -4,7 +4,7 @@
 
 Swift中枚举非常强大，基于OC枚举的基础上增加了很多的功能，Swift中的枚举是枚举和联合体的联合，同时还能定义实例方法和构造函数，还可以遵循协议，非常灵活。
 
-在Swift中，枚举类型是 first-clase，采用了很多类中才有的特性：
+在Swift中，枚举类型是 **first-class**，采用了很多类中才有的特性：
 
 * 计算属性，用于提供枚举值的附加信息
 * 实例方法，于提供和枚举值相关联的功能
@@ -107,13 +107,13 @@ Swift中类和结构体非常的像，具有很多传统类的特性，都可以
 
 ### 不同点
 
-| Struct         | Class           |      |
-| -------------- | --------------- | ---- |
-| 成员逐一构造器 |                 |      |
-| 值类型         | 引用类型        |      |
-|                | 继承            |      |
-|                | 恒等判断（===） |      |
-|                | 析构器          |      |
+| Struct         | Class           |
+| -------------- | --------------- |
+| 成员逐一构造器 |                 |
+| 值类型         | 引用类型        |
+|                | 继承            |
+|                | 恒等判断（===） |
+|                | 析构器          |
 
 
 
@@ -150,7 +150,689 @@ class SomeClass {
 
 ### 指针
 
-Swift里面的引用类型并不是用指针实现，不直接指向内存地址。如果需要用与指针进行交互，参考 手动管理内存。
+Swift里面的引用类型并不是用指针实现，不直接指向内存地址。如果需要用与指针进行交互，参考 手动管理内存。一般与C交互的时候才需要用到Swift指针部分。
 
-参考：[Manual Memory Management](https://developer.apple.com/documentation/swift/swift_standard_library/manual_memory_management)
+参考：
+
+* [官方文档Manual Memory Management](https://developer.apple.com/documentation/swift/swift_standard_library/manual_memory_management)
+
+* [Swift 中的指针使用](https://onevcat.com/2015/01/swift-pointer/)
+
+
+
+## 属性
+
+属性从存储角度分为：
+
+* 存储属性，即实例变量或常量，可用于 类、结构体
+* 计算属性，提供get、set方法，可用于 类、结构体、枚举，只能用`var`修饰
+
+从类的角度分为：
+
+* 实例属性，类的实例，包含存储属性、计算属性
+* 类型属性，类型属性也有 存储类型属性 和 计算类型属性，**first-class（枚举、结构体、类）都可以有类型属性**
+
+**结构体是值类型，当赋值给常量后，不能再修改其任何属性。**
+
+
+
+### 延时加载存储属性
+
+* 关键字  lazy
+* 第一次调用时才会被创建，必须声明为 var，即只能是变量
+* 实例属性的lazy是非线程安全；类属性的 lazy 是线程安全的，只会创建一次
+
+```swift
+class DataManager {
+    lazy var importer = DataImporter()		//复杂计算放到延迟创建
+}
+```
+
+
+
+### 计算属性
+
+计算属性不直接存储实例变量，只提供set、get 方法
+
+关键词：`set`、`get`、`newValue`
+
+
+
+```swift
+//计算属性
+struct Test {
+    var one: Int {
+        get{
+            return 10
+        }
+        set(newOne){
+            print(newOne)
+        }
+    }
+  
+    var Two: Int {
+        get{
+            return 10
+        }
+        set{
+            print(newValue)		//简化set写法，直接使用默认名称 newValue
+        }
+    }
+}
+
+//只读计算属性，可直接省略get和花括号
+struct Test {
+    var one: Int {
+        return 10
+    }
+}
+
+```
+
+
+
+### 属性观察器
+
+类似OC的KVC机制，监控和响应属性值的变化。
+
+关键词：`willSet`、`didSet`、`newValue`、`oldValue`
+
+观察器：
+
+* `willSet` 在新的值被设置之前调用，可指定参数名称，或用默认`newValue`
+* `didSet` 在新的值被设置之后调用，可指定参数名称，或用默认`oldValue`
+
+
+
+```swift
+class StepCounter {
+    var totalSteps: Int = 0 {
+        willSet {
+            print(newValue)
+        }
+        didSet {
+            print(oldValue)
+        }
+    }
+}
+```
+
+
+
+####  in-out 方式参数
+
+如果将带有观察器的属性通过 in-out 方式传入函数，`willSet` 和 `didSet` 也会调用。这是因为 in-out 参数采用了拷入拷出内存模式：即在函数内部使用的是参数的 copy，函数结束后，又对参数重新赋值。关于 in-out 参数详细的介绍，请参考 [输入输出参数]()。
+
+
+
+```swift
+
+class StepCounter {
+    var totalSteps: Int = 0 {
+        willSet {
+            print(newValue)
+        }
+        didSet {
+            print(oldValue)
+        }
+    }
+    
+    func testInOut( p : inout Int) -> Void {   
+        p = 3		//这里是不会触发属性观察器；函数出栈后触发观察器
+    }
+}
+
+let test = StepCounter();
+test.totalSteps = 5;		//触发 willSet、didSet
+test.testInOut(p: &test.totalSteps)
+print(test.totalSteps);		//如果没有该行代码，是不会触发观察器，内部做了优化。
+
+```
+
+
+
+### 属性包装器
+
+属性包装器简单来说就是一套模板，通过这个模板，快速设置属性的set、get方法。确实非常强大。
+
+关键字：`@propertyWrapper`、`wrappedValue`
+
+```swift
+@propertyWrapper
+struct ConsoleSetLog {
+    private var number: Int
+    init() { self.number = 0 }
+    //通过 wrappedValue 来声明模板
+    var wrappedValue: Int {
+        get {   return number   }
+        set {
+            number = newValue
+            print("This is a set of porperty wrapper")
+            print(newValue)
+        }
+    }
+    
+    //Wrapper内也可实现函数等
+    func foo() { print("Foo") }
+}
+
+class TestPropertyWrapper {
+    @ConsoleSetLog var one : Int;		//one通过属性包装器自动获得 对应 get、set方法
+}
+
+var test = TestPropertyWrapper()
+test.one = 10;
+
+```
+
+
+
+#### 初始值
+
+设置被包装属性的初始值有三种方法：
+
+* 在构造函数内赋初值
+* 在属性包装器内，实现对应构造函数，声明可直接赋值
+* 在属性包装器内，实现对应构造函数，声明可实现自定义特性
+
+
+
+**在构造函数内赋初值**
+
+```swift
+@propertyWrapper
+struct TwelveOrLess {
+    var number: Int
+    init() { self.number = 1 }
+    
+    
+    var wrappedValue: Int {
+        get { return number }
+        set { number = min(newValue, 12) }
+    }
+}
+
+struct SmallRectangle {
+    @TwelveOrLess var height : Int
+    @TwelveOrLess var width : Int
+    
+    
+    init() {
+        self.height = 2		//在构造器内直接对变量赋值
+        self.width = 2
+    }
+}
+```
+
+
+
+**在属性包装器内，实现对应构造函数，声明可直接赋值，或实现自定义特性**
+
+```swift
+
+@propertyWrapper
+struct SmallNumber {
+    private var maximum: Int
+    private var number: Int
+
+    var wrappedValue: Int {
+        get { return number }
+        set { number = min(newValue, maximum) }
+    }
+
+  	//默认构造器
+    init() {
+        maximum = 12
+        number = 0
+    }
+  
+ 		//@SmallNumber var height: Int = 1 时调用
+    init(wrappedValue: Int) {
+        maximum = 12
+        number = min(wrappedValue, maximum)
+    }
+  
+  	//@SmallNumber(wrappedValue: 2, maximum: 5) var height: Int 时调用
+    init(wrappedValue: Int, maximum: Int) {
+        self.maximum = maximum
+        number = min(wrappedValue, maximum)
+    }
+}
+
+
+struct UnitRectangle {
+    @SmallNumber var height: Int = 1		//调用 init(wrappedValue: Int)  构造器
+    @SmallNumber var width: Int = 1			//也会调用 init(wrappedValue: Int)  构造器
+}
+
+struct NarrowRectangle {
+    @SmallNumber(wrappedValue: 2, maximum: 5) var height: Int	//调用 init(wrappedValue: Int, maximum: Int) 构造器
+    @SmallNumber(wrappedValue: 3, maximum: 4) var width: Int	//也会调用 init(wrappedValue: Int, maximum: Int) 构造器
+}
+
+```
+
+
+
+#### 呈现值
+
+属性包装器可以呈现一个值。
+
+关键词：`$`
+
+```swift
+@propertyWrapper
+struct SmallNumber {
+    private var number: Int
+    var projectedValue: Bool
+    init() {
+        self.number = 0
+        self.projectedValue = false
+    }
+    var wrappedValue: Int {
+        get { return number }
+        set {
+            if newValue > 12 {
+                number = 12
+                projectedValue = true			//呈现值
+            } else {
+                number = newValue
+                projectedValue = false		//呈现值
+            }
+        }
+    }
+}
+struct SomeStructure {
+    @SmallNumber var someNumber: Int
+}
+var someStructure = SomeStructure()
+
+someStructure.someNumber = 4
+print(someStructure.$someNumber)				//使用$符号，访问呈现值
+// 打印 "false"
+
+someStructure.someNumber = 55
+print(someStructure.$someNumber)				//使用$符号，访问呈现值
+// 打印 "true"
+```
+
+
+
+### 全局变量和局部变量
+
+全局变量是在函数、方法、闭包或任何类型之外定义的变量。局部变量是在函数、方法或闭包内部定义的变量。
+
+* 全局变量或局部变量可以定义为计算型变量
+* 全局变量或局部变量可以为存储型变量定义观察器
+* 全局的常量或变量都是延迟计算的，不需要lazy修饰
+* 局部范围的常量和变量从不延迟计算
+
+
+
+### 类型属性
+
+类型属性也很好理解，就是类属性，独立于实例外，属于类。**first-class都可以有类型属性。**
+
+* 关键字：`static`、`class`
+* 类属性必须为存储型类型属性指定默认值。
+* 在为类定义计算型类型属性时，可以改用关键字 class 来支持子类对父类的实现进行重写。
+
+```swift
+class SomeClass {
+    static var storedTypeProperty = "Some value."		//类存储属性
+    static var computedTypeProperty: Int {					//类计算属性
+        return 27
+    }
+  
+  	//用 class 声明，该 类计算属性 支持被子类重写
+    class var overrideableComputedTypeProperty: Int {
+        return 107
+    }
+}
+```
+
+
+
+
+
+## 方法
+
+
+
+### 结构体和枚举
+
+结构体和枚举是值类型。默认情况下，值类型的属性不能在它的实例方法中被修改。可使用  mutating 关键字，让方法可以修改实例的方法。原理是会重新生成一个结构体赋值给这个实例的self
+
+* 关键字：mutating
+
+```swift
+//错误示例
+struct Point {
+    var x = 0.0, y = 0.0
+  
+  	//这种写法会报错，因为结构体和枚举内，属性不能被示例方法修改
+    muta func moveBy(x deltaX: Double, y deltaY: Double) {
+        x += deltaX
+        y += deltaY
+    }
+}
+
+//正确示例
+struct Point {
+    var x = 0.0, y = 0.0
+    mutating moveBy(x deltaX: Double, y deltaY: Double) {
+        x += deltaX
+        y += deltaY
+    }
+}
+
+```
+
+
+
+### 类方法
+
+关键字：`static`、`class`
+
+在方法的 func 关键字之前加上关键字 static，来指定类型方法。类还可以用关键字 class 来指定，从而允许子类重写父类该方法的实现，与属性的定义相同。
+
+**First-class都可以有类方法。**
+
+```swift
+class SomeClass {
+    //类变量
+    static var highestUnlockedLevel = 1
+    //类方法
+    static func someClassFunc(){
+        
+    }
+    //可重写父类的类方法
+    class func someSubMethod() {
+        
+    }
+}
+```
+
+
+
+## 下标
+
+关键字：`subscript`
+
+可通过 subscript 对枚举、结构体、类定义下标，使用类似数组下标访问的方式对 枚举、结构体、类 进行快捷访问。
+
+下标的定义方法类似计算属性，使用到了`get`、`set`，这块与计算属性相同
+
+```swift
+struct TestSubscript {
+    var object : [String] = ["one", "two", "Three", "Four"]
+    
+  	//定义下标
+    subscript(index :Int) -> String? {
+        get{
+            if index < object.count {
+                return object[index]
+            }else{
+                return nil
+            }
+        }
+        set{
+            if index >= 0 && index < object.count {
+                object[index] = newValue!
+            }
+        }
+    }
+    
+}
+
+let test = TestSubscript();
+printf(TestSubscript[0]);			//通过下标访问
+printf(TestSubscript[1]);			//通过下标访问
+```
+
+**注：下标的入参和出参个数不限，类型不限。**
+
+
+
+### 类型下标
+
+关键字：`static`、`class`
+
+**First-class都可以有类型下标(`class`关键字为类独有）**
+
+```swift
+enum Planet: Int {
+    case mercury = 1, venus, earth, mars, jupiter, saturn, uranus, neptune
+    static subscript(n: Int) -> Planet {
+        return Planet(rawValue: n)!
+    }
+}
+let mars = Planet[4]
+print(mars)
+```
+
+
+
+## 继承
+
+只有类才有继承特性，结构体和枚举没有。
+
+关键字：`override`、`final`、`super`
+
+* 使用`override`，重写父类 方法、属性、观察器属性、下标等
+* 使用`final`，防止类、方法、属性、观察器、下标被重写，例如：`final var`、`final func`、f`inal class` 以及 `final subscript`
+* 使用`super`，访问父类 方法、属性、下标等。
+
+
+
+## 构造过程
+
+### 多态
+
+面对对象的三大特性：继承、封装、多态。
+
+**多态的定义：相同的行为，不同的实现。**
+
+多态的理解，可以从两方面：
+
+* 静态多态，方法重载和方法重写
+  * 方法重载，方法名相同，参数不同
+  * 方法重写，子类重写父类方法
+* 动态多态，代码中使用基类代替多个具体的子类，更加抽象化。
+
+
+
+### 构造基本形式
+
+```swift
+init() {
+    // 在此处执行构造过程，为所有变量初始化值
+}
+```
+
+注意点：
+
+* Optional类型可以自动初始化为nil
+
+* let常量只能在构造函数中初始化一次
+
+* 如果所有变量定义时就已赋初值，则会自动创建默认构造函数
+
+* 通过闭包或全局函数设置属性的默认值
+
+  ```swift
+  class SomeClass {
+      let someProperty: SomeType = {
+          // 在这个闭包中给 someProperty 创建一个默认值
+          // someValue 必须和 SomeType 类型相同
+          return someValue
+      }()
+  }
+  ```
+
+* 结构体逐一成员构造器（memberwise initializer)，当没有显示指定构造器时，结构体会自动获得一个逐一成员构造器。一旦有自定义构造器，则逐一成员构造器失效
+
+  ```swift
+  struct Size {
+      var width = 0.0, height = 0.0
+  }
+  
+  //memberwise initializer
+  let twoByTwo = Size(width: 2.0, height: 2.0)
+  ```
+
+  
+
+### 值类型的构造器（枚举或结构体）
+
+* 值类型构造器只能代理到自身其他构造器里，不存在便利构造器
+* 如果你为某个值类型定义了一个自定义的构造器，你将无法访问到默认构造器（如果是结构体，还将无法访问逐一成员构造器）。但是在extension写自定义构造器，则可以规避这个问题。
+
+
+
+### 类的构造器
+
+关键字：`init`、`convenience`
+
+```swift
+//指定构造器
+init(parameters) {
+    statements
+}
+
+//便利构造器
+convenience init(parameters) {
+    statements
+}
+```
+
+
+
+#### 构造器代理
+
+构造器代理调用的三条规则
+
+* 规则 1 指定构造器必须调用其直接父类的的指定构造器。
+* 规则 2 便利构造器必须调用同类中定义的其它构造器。
+* 规则 3 便利构造器最后必须调用指定构造器。
+
+即，**指定构造器必须总是向上代理，便利构造器必须总是横向代理**
+
+<img src="./img/initRuler.png" style="zoom:50%;" />
+
+
+
+```swift
+class Food {
+    var name: String
+  
+  	//指定构造器，可以有多个
+    init(name: String) {
+        self.name = name
+    }
+  
+  	//便利构造器，可以有多个，可以代理到其他遍历构造器，但最有一个便利构造器一定要代理到指定构造器上
+    convenience init() {
+        self.init(name: "[Unnamed]")		//代理到 指定构造器 init(name: String)
+    }
+  
+    convenience init(other: String) {
+        self.init()			//代理到 便利构造器 convenience init() 
+    }
+}
+```
+
+
+
+#### 两段式构造过程
+
+```swift
+    
+//两段式构造过程
+init(){
+      
+       //这里是第一阶段，类中的每个存储型属性赋一个初始值，这个阶段是从子类往父类层层调用
+        a1 = "test"
+        a2 = 4
+
+
+        
+        super.init(b: "2")
+
+        //这里是第二阶段，它给每个类一次机会，在新实例准备使用之前进一步自定义它们的存储型属性，这个阶段是父类往子类层层调用
+        b1 = "3"
+        self.testFunc()
+    }
+
+//如果子类的构造器没有在阶段 2 过程中做自定义操作，并且父类有一个无参数的指定构造器，你可以在所有子类的存储属性赋值之后省略 super.init() 的调用
+init(origin: Point, size: Size) {
+    self.origin = origin
+    self.size = size
+  	
+  	//省略 super.init() 的调用
+}
+
+```
+
+
+
+#### 构造器的继承和重写
+
+* 默认情况下，Swift 中的子类默认情况下不会继承父类的构造器
+* 需要重写父类构造器时，必须跟函数一样，显式使用 `override`
+
+
+
+**子类自动继承父类构造器的情况**
+
+* 规则 1,**如果子类没有定义任何指定构造器**，**它将自动继承父类所有的指定构造器**。
+
+* 规则 2，**如果子类提供了所有父类指定构造器的实现**——无论是通过规则 1 继承过来的，还是提供了自定义实现——**它将自动继承父类所有的便利构造器**。
+
+  
+
+  <img src="./img/initializersInherit.png" style="zoom:50%;" />
+
+图中，由于子类提供了所有父类指定构造器的实现，所以自动继承了Food类的便利构造器
+
+
+
+#### 必要构造器
+
+关键字：`required`
+
+```swift
+class SomeClass {
+  	//声明子类必须重写该构造器，且子类不需要使用override
+    required init() {
+    }
+}
+```
+
+
+
+### 可失败构造器
+
+构造器存才返回nil的情况，则可创建**可失败构造器**
+
+基本形式：`init?`、init!
+
+```swift
+struct Animal {
+    let species: String
+  
+  	//可失败构造器
+    init?(species: String) {
+        if species.isEmpty {
+            return nil
+        }
+        self.species = species
+    }
+}
+
+//init!
+init!(){
+		//一旦 init! 构造失败，则会触发一个断言
+}
+```
 
