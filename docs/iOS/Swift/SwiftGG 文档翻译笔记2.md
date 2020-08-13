@@ -220,7 +220,7 @@ struct Test {
     }
 }
 
-//只读计算属性，可直接省略get和花括号
+//只读计算属性，可直接省略get和花括号。注意有set 必须要有get，但可以只有get。
 struct Test {
     var one: Int {
         return 10
@@ -894,5 +894,286 @@ Swift中可以对 **枚举、结构体、类、协议 **进行扩展，功能非
 **不能扩展的点：**
 
 * 不能重写已经存在的功能
-* 不能给类添加新的指定构造器或析构器，这些必须由原始类实现，只能添加新的便利构造器。但对于值类型（枚举、结构体），可以添加指定构造器（值类型不存在便利构造器）。
+* 不能添加存储属性
+* **不能给类添加新的指定构造器或析构器，这些必须由原始类实现，只能添加新的便利构造器。**但对于值类型（枚举、结构体），可以添加指定构造器（值类型不存在便利构造器）。
+
+
+
+## 协议
+
+Swift中协议，可以声明 方法、属性，此外还有一些细节注意点
+
+
+
+### 基本格式
+
+```swift
+//定义一个协议
+protocol FirstProtocol {
+  
+}
+
+protocol SomeProtocol {
+    
+  	//声明属性（存储属性或计算属性），必须指定可读可写
+    var mustBeSettable: Int { get set }					//可读可写
+    var doesNotNeedToBeSettable: Int { get }		//可读，只要满足可读要求即可，非只读
+  
+  	//声明 类属性，需要用到 static 关键字，
+  	static var someTypeProperty: Int { get set }
+    static var someTypeProperty_2: Int { get set }
+  
+  	//声明 类方法
+  	static func someTypeFunc()
+  
+  	//声明 mutating 方法，用于结构体或枚举中该方法修改自身值，必须使用 mutating 关键字，否则对应实现无法修改自身属性
+    mutating func toggle()
+  
+  	//声明 构造器，实现类必须 用required关键字
+  	init(someParameter: Int)
+}
+
+//实现协议的方法，（先写继承类，后写协议）
+class SomeClass: SuperClass, FirstProtocol, SomeProtocol {
+  
+  	//存储属性实现（也可用计算属性方式实现）
+  	var mustBeSettable: Int = 0
+  	
+  	//计算属性实现（也可用存储属性方式实现）
+    var doesNotNeedToBeSettable: Int{
+        get{
+            return 1
+        }
+        set{
+            print(newValue)
+        }
+    }
+  
+  	//类属性实现
+    static var someTypeProperty: Int = 2		//存储属性只能用static
+  	//类计算属性可以用 static 或 class
+    class var someTypeProperty_2: Int{
+        get{
+            return 1
+        }
+        set{
+            
+        }
+    }
+    
+  	//实现 类方法，可用 static 或 class
+    static func someTypeFunc() -> Void{
+        
+    }
+  
+  	//实现 构造器，必须 用required 关键字
+    required init(someParameter: Int) {
+        
+    }
+  
+  	//协议合成，关键字 & ，变量 para 需要同时遵守  FirstProtocol 和  SomeProtocol 协议
+    func wishHappyBirthday(to para: FirstProtocol & SomeProtocol) {
+        
+    }
+  
+  	
+		
+}
+
+//------------------------------------------------ 
+//定义类专属协议，即只能class实现该协议，必须使用关键字 AnyObject
+protocol SomeClassOnlyProtocol: AnyObject {
+  
+}
+
+//实现类专属协议，这里只能class实现
+class TestOnlyClass : SomeClassOnlyProtocol {
+    
+}
+
+//未遵守任何协议
+class TestClassNoProtocl {
+    
+}
+
+/*
+
+判断是否遵守协议，is, as? , as!
+is , 表示是否遵守协议，返回 ture or not
+as? , 如果遵守协议返回 协议的可选值；否则返回nil
+as! , 强制转换为协议类型，如果不遵守该协议，则会触发运行时错误
+
+*/
+class TestIsAs {
+    
+    func test(){
+        let array : [AnyObject] = [
+            TestOnlyClass(),
+            TestClassNoProtocl()
+        ]
+        
+        for object in array {
+            
+            //is, 表示是否遵守协议，返回 ture or not
+            if object is SomeClassOnlyProtocol {
+                print("\(object) is SomeClassOnlyProtocol")
+            }else{
+                print("\(object) is not SomeClassOnlyProtocol")
+            }
+            
+            //as? , 如果遵守协议返回 协议的可选值；否则返回nil
+            if let value = (object as? SomeClassOnlyProtocol) {
+                //if let 使用了可选绑定对其进行解值，(object as? SomeClassOnlyProtocol) 类型为 Optional<SomeClassOnlyProtocol>
+                print("\(value) is SomeClassOnlyProtocol")
+            }else{
+                print("\(object) is not SomeClassOnlyProtocol")
+            }
+            
+            //as! , 强制转换为协议类型，如果不遵守该协议，则会触发运行时错误
+            let value = object as! SomeClassOnlyProtocol
+            print(value)
+            
+        }
+        
+        
+    }
+}
+
+```
+
+
+
+### 扩展
+
+```swift
+
+protocol OneProtocol {
+    func one()
+}
+
+
+//扩展增加协议实现
+class OneClass{
+}
+extension OneClass: OneProtocol{
+   func one() {
+   }
+}
+
+//类 和 扩展 均可放置实现 和 声明，有一点需要注意，即使满足了协议的所有要求，类型也不会自动遵循协议，必须显式地遵循协议。
+class TwoClass: OneProtocol{
+
+}
+extension TwoClass{
+    //实现 放到扩展中
+    func one() {
+    }
+}
+class ThreeClass{
+    func one() {
+    }
+}
+extension ThreeClass: OneProtocol{
+    //声明 放到扩展中
+}
+
+
+
+
+//对协议进行扩展，扩展里的方法必须有默认实现
+protocol TwoProtocol {
+    func two()
+}
+extension TwoProtocol{
+    func two(){
+        print("two")
+    }
+    
+    //会直接报错，必须有方法实现
+//    func three()
+    
+    //给协议增加方法，但是必须有默认实现
+    func four() -> Void{
+        print("four")
+    }   
+}
+class FourClass: TwoProtocol{
+    
+    //可以不用实现 two(),four() 方法
+    
+    //也可以重写默认实现
+    func four() {
+        print("sss")
+    }
+}
+
+
+//扩展中的where语句
+
+//有条件地遵循协议，只有当 Array 遵守 TextRepresentable 时，才会有该实现
+protocol TextRepresentable {
+}
+extension Array: TextRepresentable where Element: TextRepresentable {
+    func test(){
+        print("Array - TextRepresentable")
+    }
+}
+class TestClass: TextRepresentable {
+    
+}
+class AClass {
+    
+}
+        
+let array = [
+    TestClass(),
+]
+array.test()		//只有array里元素都遵守 TextRepresentable 时，才能调用此方法
+
+
+//通过where语句为协议扩展添加限制条件，只有遵循协议的类型满足这些限制条件时，才能获得协议扩展提供的默认实现
+extension Collection where Element: Equatable {
+    func allEqual() -> Bool {
+        for element in self {
+            if element != self.first {
+                return false
+            }
+        }
+        return true
+    }
+}
+```
+
+
+
+### 可选协议
+
+Swift中协议里的属性、方法都必须实现，不存在可选的概念。
+
+但是作为变通，有两种方法可以实现类似可选的概念
+
+```swift
+//第一种方法，使用扩展为协议增加默认实现
+protocol TwoProtocol {
+    func two()
+}
+extension TwoProtocol{
+  	//通过扩展，给协议方法增加默认实现
+    func two(){
+        print("two")
+    }
+}
+class TestClass: TextRepresentable {
+    //实现类可不用再实现 func two()
+}
+
+
+//第二种方法，使用 @objc 和 optional 组合，该方法只针对 继承OC的类或者被 @objc标记的类，用于与OC交互时使用，结构体和枚举则不能实现该协议
+import Foundation
+@objc protocol CounterDataSource {
+    @objc optional func increment(forCount count: Int) -> Int
+    @objc optional var fixedIncrement: Int { get }
+}
+
+```
 

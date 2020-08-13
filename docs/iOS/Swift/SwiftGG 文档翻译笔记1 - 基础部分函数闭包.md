@@ -82,7 +82,7 @@ var serverResponseCode: Int? = 404
 
 ##### 可选绑定
 
-可选绑定用于 if, while语句中，如果someOptional有值则赋给变量，无值则为nil
+可选绑定用于 if, while语句中，如果someOptional有值则解析后赋给变量，无值则为nil
 
 ```swift
 if let constantName = someOptional {
