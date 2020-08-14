@@ -1,9 +1,19 @@
+---
+title: SwiftGG 文档翻译笔记1-基础部分函数闭包
+date: 2020-08-07 19:57:13
+sidebarDepth: 4
+categories: 
+ - iOS
+tags: 
+ - Swift
+---
+
+[[toc]]
 [toc]
 
-# SwiftGG 文档翻译笔记1 - 基础部分函数闭包
 
+# SwiftGG 文档翻译笔记1-基础部分函数闭包
 基础部分函数闭包
-
 
 
 ## Swift基础部分
@@ -217,9 +227,9 @@ a != nil ? a! : b
 
 ## 集合类型
 
-* 数组，Array<Element>
-* 集合，Set<Element>
-* 字典，Dictionary<Key, Value>
+* 数组，`Array<Element>`
+* 集合，`Set<Element>`
+* 字典，`Dictionary<Key, Value>`
 
 
 

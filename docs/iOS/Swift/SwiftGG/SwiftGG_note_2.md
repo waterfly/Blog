@@ -1,4 +1,22 @@
-# SwiftGG 文档翻译笔记2
+---
+title: SwiftGG 文档翻译笔记2-FirstClass
+date: 2020-08-14 19:57:13
+sidebarDepth: 4
+categories: 
+ - iOS
+tags: 
+ - Swift
+---
+
+[[toc]]
+[toc]
+
+
+# SwiftGG 文档翻译笔记2-FirstClass
+
+枚举、结构体、类、协议、扩展
+
+
 
 ## 枚举
 
