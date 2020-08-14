@@ -33,7 +33,7 @@ module.exports = {
           title: 'OC',   // 必要的
           path: '/iOS/OC/',      // 可选的, 标题的跳转链接，应为绝对路径且必须存在
           collapsable: true, // 可选的, 默认值是 true,
-          sidebarDepth: 1,    // 可选的, 默认值是 1
+          sidebarDepth: 6,    // 可选的, 默认值是 1
           children: [
             './OC/',
             './OC/JavaSrciptCore/JavaSrciptCore',
@@ -58,7 +58,7 @@ module.exports = {
           title: 'Swift',   // 必要的
           path: '/iOS/Swift/',      // 可选的, 标题的跳转链接，应为绝对路径且必须存在
           collapsable: true, // 可选的, 默认值是 true,
-          sidebarDepth: 4,    // 可选的, 默认值是 1
+          sidebarDepth: 6,    // 可选的, 默认值是 1
           children: [
             './Swift/',
             './Swift/SwiftGG/SwiftGG_note_1',
