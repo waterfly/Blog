@@ -85,7 +85,7 @@ serverResponseCode = nil
 
 ```swift
 var serverResponseCode: Int? = 404
-!serverResponseCode		//对serverResponseCode进行强制解析，前提是必须有值，如果serverResponseCode为nil，对其进行强制解析，则会报错
+serverResponseCode!		//对serverResponseCode进行强制解析，前提是必须有值，如果serverResponseCode为nil，对其进行强制解析，则会报错
 ```
 
 
@@ -453,6 +453,35 @@ swapTwoInts(&someInt, &anotherInt)
 
 
 
+
+
+### 闭包的循环强引用
+
+关键词：`weak`、`unowned`
+
+* `weak`，弱引用，类型必须是Optional，释放后会被置为nil
+* `unowned`，无主引用，用于不会变成 nil的变量
+
+循环强引用，在Swift中的解决方案是：捕获列表。
+
+```swift
+//基本格式，用中括号提前修饰变量，这里需要注意，unowned self 即对self修饰过了，内部可以放心用self
+{
+    [unowned self, weak delegate = self.delegate]
+    //...
+}
+
+
+lazy var someClosure = {
+    [unowned self, weak delegate = self.delegate] in
+    // 这里是闭包的函数体
+}
+```
+
+
+
+
+
 ### 尾随闭包
 
 函数参数最后一个为闭包时，可用尾随闭包的形式，写起来更简单明了
@@ -486,7 +515,7 @@ someFunctionThatTakesAClosure() {
 
 关键字：`@escaping`
 
-当闭包作为参数传递到函数内，如果函数内没有明确调用该闭包，比如一部调用，则该闭包必须声明为逃逸闭包，否则编译会报错。**调用标记为 @escaping的闭包时，如果有用到self内容时，必须显式使用 self**
+当闭包作为参数传递到函数内，如果函数内没有明确调用该闭包，比如不调用，则该闭包必须声明为逃逸闭包，否则编译会报错。**调用标记为 @escaping的闭包时，如果有用到self内容时，必须显式使用 self**
 
 ```swift
 //逃逸闭包
@@ -529,28 +558,4 @@ serve(customer: customersInLine.remove(at: 0))		//这里省去了大括号
 // 打印“Now serving Ewa!”
 ```
 
-
-
-### 闭包的循环强引用
-
-关键词：`weak`、`unowned`
-
-* `weak`，弱引用，类型必须是Optional，释放后会被置为nil
-* `unowned`，无主引用，用于不会变成 nil的变量
-
-循环强引用，在Swift中的解决方案是：捕获列表。
-
-```swift
-//基本格式，用中括号提前修饰变量，这里需要注意，unowned self 即对self修饰过了，内部可以放心用self
-{
-    [unowned self, weak delegate = self.delegate]
-    //...
-}
-
-
-lazy var someClosure = {
-    [unowned self, weak delegate = self.delegate] in
-    // 这里是闭包的函数体
-}
-```
 
