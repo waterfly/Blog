@@ -235,7 +235,70 @@ a != nil ? a! : b
 
 ## 控制流
 
+* for语句
+* while语句
+* if...else语句
+* switch...case语句
+
+### for语句
+
+关键字：`for`, `stride`
+
+```swift
+//swift中已废弃 c风格的for语句
+for(int i = 0 ; i < 10; i++){  
+		//c风格的for语句，已废弃
+} 
+
+//swift for语句
+//数组遍历
+for value in array{
+  
+}
+//区间遍历
+for i in 0..<10 {  
+      
+}  
+//不关心值也可省略
+for _ in 1...power {
+}
+
+
+//带步长的for循环
+let minuteInterval = 5
+for tickMark in stride(from: 0, to: minutes, by: minuteInterval) {
+    // 每5分钟渲染一个刻度线（0, 5, 10, 15 ... 45, 50, 55）
+}
+
+//从大到小遍历
+for i in stride(from: 10, to: 0 ,by: -1) {
+    //从10遍历到0
+    print(i)
+}
+```
+
+
+
+### while
+
+关键字：`repeat`
+
+```swift
+while condition {
+    statements
+}
+
+//类似do...while
+repeat {
+    statements
+} while condition
+```
+
+
+
 ### switch...case
+
+关键字：`fallthrough`
 
 * 不需要break语句，单条执行完结束（需要类似C语言的Case贯穿效果，可以使用  fallthrough）
 
@@ -255,7 +318,14 @@ a != nil ? a! : b
   
   ```
 
-  
+
+
+
+
+
+
+
+
 
 ### guard-else
 
