@@ -17,7 +17,7 @@ tags:
 
 泛型是Swift非常强大的特性之一。
 
-
+关键字：`< >` , `associatedtype`
 
 ```swift
 /*
@@ -104,4 +104,92 @@ extension Container where Item: Equatable {
 
 ```
 
+
+
+## 可选链
+
+关键字：`?` , `!`
+
+```swift
+//代码示例
+//定义，如果 john.residence 为 nil，则整个表达式为nil;如果不为nil，则调用  numberOfRooms
+john.residence?.numberOfRooms
+
+//强制解析写法对比，如果使用强制解析，为nil则直接产生运行时错误
+john.residence!.numberOfRooms
+
+//通过可选连可调用函数，如果 调用 printNumberOfRooms() 失败，则为nil
+if john.residence?.printNumberOfRooms() != nil {
+    print("It was possible to print the number of rooms.")
+} else {
+    print("It was not possible to print the number of rooms.")
+}
+```
+
+
+
+## 错误处理
+
+
+
+## 类型转换
+
+关键字：`is` , `as` , `as?` , `as!` , `Any` , `AnyObject`
+
+只用于Class
+
+
+
+```swift
+//is, 用于检查类型，与OC isKindOf相同
+item is Movie		//表达式为 true 或 false
+
+//as, 类型转换，有三种使用场景
+//1. 从派生类转换为基类，向上转型（upcasts）
+class Animal {}
+class Cat: Animal {}
+let cat = Cat()
+let animal = cat as Animal		// animal 类型为  Animal
+
+
+//2. 消除二义性，数值类型转换
+let num1 = 42 as CGFloat
+let num2 = 42 as Int
+let num3 = 42.5 as Int
+let num4 = (42 / 2) as Double
+
+
+//3. switch 语句中进行模式匹配
+switch animal {
+case let cat as Cat:
+    print("如果是Cat类型对象，则做相应处理")
+case let dog as Dog:
+    print("如果是Dog类型对象，则做相应处理")
+default: break
+}
+
+
+
+//向下转换（Downcasting），转换到子类型，as!, as?
+//as!，向下转换，如果失败则触发运行时错误
+class Animal {}
+class Cat: Animal {}
+let animal :Animal  = Cat()
+let cat = animal as! Cat
+
+//as?, 向下转换，但是转换失败则返回nil，不会触发错误
+let animal:Animal = Cat()
+if let cat = animal as? Cat{
+    print("cat is not nil")
+} else {
+    print("cat is nil")
+}
+
+//Any,AnyObject
+//Any,可以表示任何类型，包括函数类型
+//AnyObject,可以表示任何类类型的实例
+var things = [Any]()
+var things = [AnyObject]()
+
+```
 
