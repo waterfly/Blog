@@ -17,7 +17,7 @@ tags:
 
 泛型是Swift非常强大的特性之一。
 
-关键字：`< >` , `associatedtype`
+关键字：`< >` , `associatedtype`, `where`
 
 ```swift
 /*
