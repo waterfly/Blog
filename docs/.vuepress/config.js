@@ -63,6 +63,7 @@ module.exports = {
             './Swift/',
             './Swift/SwiftGG/SwiftGG_note_1',
             './Swift/SwiftGG/SwiftGG_note_2',
+            './Swift/SwiftGG/SwiftGG_note_3',
           ]
         },
 

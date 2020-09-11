@@ -111,6 +111,8 @@ let assumedString: String! = "An implicitly unwrapped optional string."
 let implicitString: String = assumedString  // 不需要感叹号
 ```
 
+注：一个隐式解析可选类型其实就是一个普通的可选类型，默认值为 nil，但是可以被当做非可选类型来使用，并不需要每次都使用解析来获取可选值。
+
 
 
 #### 类型别名
