@@ -37,14 +37,14 @@
 * [iOS锁总结](./docs/iOS/OC/Thread/iOS锁总结/iOS锁总结.md)
 * [API Reference 系列 之Mapkit解析](./docs/iOS/OC/Kit/API_Reference系列之Mapkit解析.md)
 * [导航栏TitleView在iOS11上不显示](./docs/iOS/OC/Other/导航栏TitleView不显示的问题.md)
-* [Xcode GPX文件Mock真机系统定位](./docs/iOS/OC/Other/Xcode_GPX文件Mock真机系统定位)
-* [《禅与Objective-C编程艺术》阅读笔记](./docs/iOS/OC/Other/《禅与Objective-C编程艺术》阅读笔记)
+* [Xcode GPX文件Mock真机系统定位](./docs/iOS/OC/Other/Xcode_GPX文件Mock真机系统定位.md)
+* [《禅与Objective-C编程艺术》阅读笔记](./docs/iOS/OC/Other/《禅与Objective-C编程艺术》阅读笔记.md)
 
 
 
 ## Web
 
-* [前端学习规划](./docs/Web/FrontLearning)
+* [前端学习规划](./docs/Web/FrontLearning.md)
 * [VSCode](./docs/Web/VSCode.md)
 * [从零搭建VuePress站点](./docs/Web/BuildVuePress/BuildVuePress.md)
 * [构建系统开发纪要](./docs/Web/AppBuild/BuildSystemWorkDiary.md)
