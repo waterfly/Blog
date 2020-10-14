@@ -186,6 +186,29 @@ extension GridPoint: Hashable {
 
 
 
+延伸参考：[nshipster-hashable](https://nshipster.com/hashable/)
+
+
+
+## Identifiable
+
+用于对类的实例变量进行ID标示
+
+> A class of types whose instances hold the value of an entity with stable identity.
+
+
+
+```swift
+protocol Identifiable {
+    associatedtype ID: Hashable
+    var id: ID { get }
+}
+```
+
+
+
+延伸参考：[nshipster-identifiable](https://nshipster.com/identifiable/)
+
 
 
 ## Tuple Comparison
