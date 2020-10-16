@@ -1,10 +1,23 @@
-## String
+---
+title: String
+date: 2020-10-16 14:40:21
+sidebarDepth: 4
+categories: 
+ - iOS
+tags: 
+ - Swift
+---
+
+[[toc]]
+[toc]
+
+
 
 SwIft完全兼容Unicode
 
 
 
-### Unicode 标量
+## Unicode 标量
 
 > Unicode 标量是对应字符或者修饰符的唯一的 21 位数字，例如 `U+0061` 表示小写的拉丁字母（`LATIN SMALL LETTER A`）（"`a`"），`U+1F425` 表示小鸡表情（`FRONT-FACING BABY CHICK`）（"`🐥`"）。
 
@@ -12,13 +25,13 @@ Unicode 标量即对应一个Unicode字符。
 
 
 
-### Character
+## Character
 
 Character，在可读层面对应的单个可读字符，在实现层面代表的是一个可扩展的*字形群*，由一个或多个Unicode标量组成。
 
 
 
-### String
+## String
 
 Swift的String与其他语言最大的不同是在索引这块。为了完全兼容Unicode，索引由`String.Index`构成，而不是整数索引，即定义了结构体`struct Index`来表示索引。这是由于Character可能是由多个Unicode标量组成，所以不能用整数索引。
 
@@ -28,11 +41,51 @@ Swift的String与其他语言最大的不同是在索引这块。为了完全兼
 
 
 
-### 常用方法
+### 多行字符串字面量
+
+```swift
+let quotation = """
+The White Rabbit put on his spectacles.  "Where shall I begin,
+please your Majesty?" he asked.
+
+"Begin at the beginning," the King said gravely, "and go on
+till you come to the end; then stop."
+"""		
+
+//使用 最后 """	符号的位置，决定文本开始开始的空格字符
+let quotation = """
+The White Rabbit put on his spectacles.  "Where shall I begin,
+please your Majesty?" he asked.
+
+		"Begin at the beginning," the King said gravely, "and go on
+	till you come to the end; then stop."
+	"""	//有效的空格，从"""位置开始，之前的空格将会被忽视
+
+//使用 #号 将文本中特殊符号 不做转义 
+let threeMoreDoubleQuotationMarks = #"""
+Here are three more double quotes: """
+"""#
+```
 
 
 
-#### 索引
+### 字符串插值
+
+使用 `\(x)`格式来作为字符串中变量
+
+```swift
+let multiplier = 3
+let message = "\(multiplier) times 2.5 is \(Double(multiplier) * 2.5)"
+// message 是 "3 times 2.5 is 7.5"
+```
+
+
+
+## 常用方法
+
+### 索引
+
+* `isEmpty`，字符串是否为空
 
 * `count`，获取Character个数
 
@@ -65,7 +118,15 @@ let characters: [Character] = Array(string)
 
 
 
-#### 遍历
+### 遍历
+
+* 使用 for-in
+
+  ```swift
+  for character in "Dog!🐶" {
+      print(character)
+  }
+  ```
 
 * 使用`String.indices`
 
@@ -102,7 +163,7 @@ let characters: [Character] = Array(string)
 
   
 
-#### 插入和删除
+### 插入和删除
 
 * `insert(_:at:)`，在一个字符串的指定索引插入一个字符
 * `insert(contentsOf:at:)`，方法可以在一个字符串的指定索引插入一个段字符串
@@ -111,7 +172,7 @@ let characters: [Character] = Array(string)
 
 
 
-#### 增加
+### 增加
 
 * `+`、`+=`运算符函数
 * `append`，增加字符串
@@ -120,6 +181,12 @@ let characters: [Character] = Array(string)
 
 
 
-#### 子字符串
+### 子字符串
 
 * `prefix(_:)`、`suffix(_:)`、`hasPrefix(_:)`、`hasSuffix(_:)`
+
+
+
+## 参考
+
+* [SwiftGG-字符串和字符](https://swiftgg.gitbook.io/swift/swift-jiao-cheng/03_strings_and_characters)

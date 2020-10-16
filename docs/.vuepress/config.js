@@ -41,6 +41,7 @@ module.exports = {
         './SwiftGG/SwiftGG_note_2',
         './SwiftGG/SwiftGG_note_3',
         './EquatableHashableComparable',
+        './String',
       ],
       '/iOS/RN/': [
         '',
