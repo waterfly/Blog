@@ -179,6 +179,41 @@ let characters: [Character] = Array(string)
 
 
 
+### 其他
+
+* `split`，根据指定字符，分割字符串成数组
+
+  ```swift
+  /*
+  	Swift中还有 components 函数，注意两者的区别。
+  	compontents = (split.omittingEmptySubsequences = false )
+  	即，比如空格来说，当以空格分割时，如果头和尾有空格，会产生一个空元素 ""
+  
+  	split.omittingEmptySubsequences 默认为true，所以建议使用split
+  */
+  
+  let str = " My name is Sudhir " // heading space,  trailing space
+  print(str.split(separator: " "));						// ["My", "name", "is", "Sudhir"]
+  print(str.components(separatedBy: " "));		//  ["", "My", "name", "is", "Sudhir", ""]
+  ```
+
+* 替换String的指定字符
+
+  ```swift
+  //1. 使用NSString的API replacingOccurrences 或 
+  let aString = "This is my string"
+  let newString = aString.replacingOccurrences(of: " ", with: "+")
+  
+  //2. 不使用NSString 的 API
+  let aString = "Some search text"
+  let replaced = String(aString.map {
+      $0 == " " ? "+" : $0
+  })
+  
+  ```
+
+  
+
 
 
 ### 子字符串
