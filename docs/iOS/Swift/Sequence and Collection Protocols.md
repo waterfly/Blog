@@ -2,9 +2,9 @@
 
 
 
-Swift是一门高度抽象化的语言，设计了大量的协议。
+Swift是一门高度抽象化的语言，设计了大量的协议。数组的功能基本都由各种协议实现。
 
-数组的功能基本都由各种协议实现。
+了解协议，有助于帮助我们记忆常用API方法。
 
 
 
@@ -49,7 +49,7 @@ Swift中Array遵守了以下协议（只列举Sequence相关）：
 
 ### Dictionary
 
-* `Sequence`
+* `Collection`
 
 
 
@@ -62,8 +62,8 @@ Swift中Array遵守了以下协议（只列举Sequence相关）：
 迭代器，Sequence的迭代器for-in就是用该协议实现。
 
 ```swift
+//自定义需要实现的方法，Required
 associatedtype Element
-
 mutating func next() -> Self.Element?
 ```
 
