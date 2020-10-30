@@ -70,3 +70,36 @@ mutating func next() -> Self.Element?
 
 
 ### Sequence
+
+Sequence是一个集合协议抽象，提供了基本的集合抽象。内部集成了迭代器（遵守`IteratorProtocol`协议），可以直接
+
+```swift
+
+struct CustomIterator: IteratorProtocol{
+    var count : Int
+    mutating func next() -> Int? {
+        if  count == 0 {
+            return nil
+        }else{
+            defer {
+                count -= 1
+            }
+            return count
+        }
+    }
+}
+
+struct TestSequence: Sequence {
+    
+    var count: Int
+    
+    func makeIterator() -> CustomIterator {
+        return CustomIterator(count: count);
+    }
+}
+
+
+```
+
+
+
