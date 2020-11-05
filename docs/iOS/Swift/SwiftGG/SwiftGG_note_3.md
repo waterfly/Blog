@@ -130,7 +130,7 @@ if john.residence?.printNumberOfRooms() != nil {
 
 ## 错误处理
 
-关键字：`Error`, `throws` , `throw`, `do-catch`, `try`,  `try?`, `try!`
+关键字：`Error`, `throws` , `throw`, `do-catch`, `try`,  `try?`, `try!`，`rethrows`
 
 > Notice: Swift 中的错误处理并不涉及解除调用栈，这是一个计算代价高昂的过程。就此而言，**throw 语句的性能特性是可以和 return 语句相媲美的**。
 
@@ -145,6 +145,7 @@ do-catch: Swift处理错误的一种方式
 try: 			用于函数内传递错误
 try?: 		处理错误的一种方式，如果返回是错误，则为nil
 try!: 		处理错误的一种方式，如果返回错误，则抛出运行时错误
+rethrows:	用于在高阶函数中，如果传入非throwing函数，则外部不用处理错误
 
 //1. throw使用示例
 enum TestSwiftError: Error {
@@ -213,7 +214,51 @@ func testDoCatch(){
 //使用 try! 是确定不会出现错误回调！但是一旦出现错误，则会得到运行时错误
 let y = try! canThrowErrors()
 
+
+
+//3	rethrows，用于高阶函数中，如果传入非throwing函数，则外部不用处理错误；如果用throws则必须处理错误
+extension String: Error { }
+class TestSwift {
+    
+    //生物验证，throwing函数
+    func authenticateBiometrically(_ user: String) throws -> Bool {
+        throw "Failed"
+    }
+    
+    //密码验证，非throwing函数
+    func authenticateByPassword(_ user: String) -> Bool {
+        return true
+    }
+    
+    //对外提供统一验证方法，如果用 throws ，则外部调用 authenticateUser 的地方必须处理错误，无论传入的函数是否是 throwing函数
+    func authenticateUser_throws(method: (String) throws -> Bool) throws {
+        try method("twostraws")
+        print("Success!")
+    }
+    
+    //使用 rethrows，则当传入 非throwing函数时（authenticateByPassword），外部不用处理错误
+    func authenticateUser_rethrows(method: (String) throws -> Bool) rethrows {
+        try method("twostraws")
+        print("Success!")
+    }
+    
+    func testRethrows() {
+        //由于使用了 rethrows ，则这里不用处理错误
+        authenticateUser_rethrows(method: authenticateByPassword)
+        
+        do {
+            //由于使用了 throws ，则这里必须处理错误，无论函数是否是throwing函数，否则报错
+            try authenticateUser_throws(method: authenticateByPassword)
+        } catch {
+            print("D'oh!")
+        }
+        
+    }
+}
+
 ```
+
+参考：[How to use the rethrows keyword](https://www.hackingwithswift.com/example-code/language/how-to-use-the-rethrows-keyword)
 
 
 
