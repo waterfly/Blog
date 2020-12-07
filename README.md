@@ -14,7 +14,9 @@
 * [SwiftGG 文档翻译笔记2-FirstClass](./docs/iOS/Swift/SwiftGG/SwiftGG_note_2.md)
 * [SwiftGG 文档翻译笔记3-泛型可选连错误处理访问控制等](./docs/iOS/Swift/SwiftGG/SwiftGG_note_3.md)
 * [Equatable, Hashable, Comparable](./docs/iOS/Swift/EquatableHashableComparable.md)
-
+* [String](./docs/iOS/Swift/String.md)
+* [Sequence and Collection Protocols](./docs/iOS/Swift/SequenceAndCollectionProtocols.md)
+* [Sequence](./docs/iOS/Swift/Sequence.md)
 
 
 ### RN

@@ -130,6 +130,208 @@ if john.residence?.printNumberOfRooms() != nil {
 
 ## 错误处理
 
+关键字：`Error`, `throws` , `throw`, `do-catch`, `try`,  `try?`, `try!`，`rethrows`
+
+> Notice: Swift 中的错误处理并不涉及解除调用栈，这是一个计算代价高昂的过程。就此而言，**throw 语句的性能特性是可以和 return 语句相媲美的**。
+
+
+
+```swift
+//关键字解释：
+Error:		错误协议，throw抛出的类型必须遵守Error协议，该协议为空协议
+throws: 	声明函数为 throwing函数，可以抛出错误
+throw:		函数内抛出错误
+do-catch: Swift处理错误的一种方式
+try: 			用于函数内传递错误
+try?: 		处理错误的一种方式，如果返回是错误，则为nil
+try!: 		处理错误的一种方式，如果返回错误，则抛出运行时错误
+rethrows:	用于在高阶函数中，如果传入非throwing函数，则外部不用处理错误
+
+//1. throw使用示例
+enum TestSwiftError: Error {
+    case invalidName
+    case invaildAge
+    case invaildOther
+}
+
+
+//使用 throws 声明该函数为throwing函数，只有 throwing 函数可以传递错误。
+//任何在某个非 throwing 函数内部抛出的错误只能在函数内部处理。
+func vend(name: String?) throws{
+    
+    guard name != nil else {
+        //使用 throw 抛出Error错误类型
+        throw TestSwiftError.invalidName
+    }
+    
+    print(name);
+}
+
+
+//2. 处理错误，Swift中有四种处理错误错误方式
+
+//2.1 用 throwing 函数传递错误，即把函数抛出的错误传递给调用此函数调用方，使用try
+func canThrowErrors() throws -> String{
+    try vend(name: nil)     //使用try关键字，把vend函数的错误传递给canThrowErrors的调用方处理
+}
+
+//2.2 用 do-catch 语句处理错误，使用 do-catch,try
+//do-catch基本形式
+do {
+    try expression
+    statements
+} catch pattern 1 {
+    statements
+} catch pattern 2 where condition {
+    statements
+} catch pattern 3, pattern 4 where condition {
+    statements
+} catch {
+    statements
+}
+
+//do-catch调用示例
+func testDoCatch(){
+    do {
+        try canThrowErrors()
+    } catch TestSwiftError.invalidName {
+      	//错误类型为 TestSwiftError.invalidName
+        print("invalidName")
+    }catch {
+      	//如果错误为 TestSwiftError.invalidName 以外的其他错误
+        print("Other")
+    }
+}
+
+
+//2.3 将错误作为可选类型处理，使用 try? 将错误转化为nil
+func testDoCatch(){
+  	//当canThrowErrors()抛出错误时，使用try?将错误转化为nil
+    let x = try? canThrowErrors()
+}
+
+//2.4 禁用错误传递，使用 try! 禁用错误回调，当发生错误时，得到运行时错误
+//使用 try! 是确定不会出现错误回调！但是一旦出现错误，则会得到运行时错误
+let y = try! canThrowErrors()
+
+
+
+//3	rethrows，用于高阶函数中，如果传入非throwing函数，则外部不用处理错误；如果用throws则必须处理错误
+extension String: Error { }
+class TestSwift {
+    
+    //生物验证，throwing函数
+    func authenticateBiometrically(_ user: String) throws -> Bool {
+        throw "Failed"
+    }
+    
+    //密码验证，非throwing函数
+    func authenticateByPassword(_ user: String) -> Bool {
+        return true
+    }
+    
+    //对外提供统一验证方法，如果用 throws ，则外部调用 authenticateUser 的地方必须处理错误，无论传入的函数是否是 throwing函数
+    func authenticateUser_throws(method: (String) throws -> Bool) throws {
+        try method("twostraws")
+        print("Success!")
+    }
+    
+    //使用 rethrows，则当传入 非throwing函数时（authenticateByPassword），外部不用处理错误
+    func authenticateUser_rethrows(method: (String) throws -> Bool) rethrows {
+        try method("twostraws")
+        print("Success!")
+    }
+    
+    func testRethrows() {
+        //由于使用了 rethrows ，则这里不用处理错误
+        authenticateUser_rethrows(method: authenticateByPassword)
+        
+        do {
+            //由于使用了 throws ，则这里必须处理错误，无论函数是否是throwing函数，否则报错
+            try authenticateUser_throws(method: authenticateByPassword)
+        } catch {
+            print("D'oh!")
+        }
+        
+    }
+}
+
+```
+
+参考：[How to use the rethrows keyword](https://www.hackingwithswift.com/example-code/language/how-to-use-the-rethrows-keyword)
+
+
+
+### 与OC的错误处理
+
+Swift的错误处理机制类似OC的NSError，Swift和OC的NSError机制可以互相捕捉。
+
+**但是，OC的Exception，Swift是不能处理的，必须在OC中处理**！
+
+具体参考：[Handling Cocoa Errors in Swift](https://developer.apple.com/documentation/swift/cocoa_design_patterns/handling_cocoa_errors_in_swift)
+
+
+
+## defer
+
+Swift的`defer`语句很有意思。`defer` 语句在即将离开当前代码块时执行一系列语句，无论是以何种方式离开当前代码块（抛出错误、return、break等），都会调用调用`defer`语句。
+
+**`defer`语句用于进行资源清理和避免重复的返回前需要执行的代码。**
+
+`defer`语句注意点：
+
+* defer语句的调用是在 return等语句调用后才调用
+* defer语句内不能再有 return/break/抛出错误等语句
+* 如果有多个defer语句，则遵循**先声明后调用**的原则，严格按照顺序，从最后一个声明开始依次调用。
+* defer语句的调用时机是在即将离开**作用域**时调用，**该作用域可能是 闭包、if语句、guard语句、for语句、try语句、函数等**
+* defer语句类似闭包，但是不是闭包，不会持有内部的值
+
+
+
+```swift
+//defer语句基本使用
+func processFile(filename: String) throws {
+    if exists(filename) {
+        let file = open(filename)
+        defer {
+            close(file)
+        }
+        while let line = try file.readline() {
+            // 处理文件。
+        }
+        // close(file) 会在这里被调用，即作用域的最后。
+    }
+}
+
+//注意 闭包、if语句、guard语句、for语句、try语句
+func remove(_ id: ID, acquireLock: Bool) {
+    if acquireLock {
+        lock.lock()
+        defer { lock.unlock() }
+      
+      	// defer 语句会在即将退出 if 作用域时调用，而不是函数退出时
+    }
+    tasks[id] = nil
+}
+
+//defer语句调用时机会在 return等条件转义语句后执行
+func testDefer() {
+    var num = 0
+    func foo() -> Int {
+        defer { num += 1 }      //会在 return 语句后执行
+        return num
+    }
+
+    let f = foo()
+    print("f: \(f)")        //f: 0
+    print("num: \(num)")    //num: 1
+}
+```
+
+
+
+参考：[关于 Swift defer 的正确使用](https://onevcat.com/2018/11/defer/)
+
 
 
 ## 类型转换
