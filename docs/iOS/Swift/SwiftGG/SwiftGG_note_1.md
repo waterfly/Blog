@@ -20,17 +20,123 @@ tags:
 
 ### 基础类型
 
+#### 常量和变量
+
+Swift中变量分为常量（let）和变量（var），必须声明时就要确定类型，常量赋值后不可改变
+
+```swift
+//常量
+let π = 3.14159
+let 你好 = "你好世界"
+let 🐶🐮 = "dogcow"
+
+//变量
+var maximumNumberOfLoginAttempts = 10
+var currentLoginAttempt = 0
+```
+
+
+
+#### 输出
+
+`print`
+
+```swift
+var currentLoginAttempt = 0
+print("The shopping list contains \(currentLoginAttempt) items.")
+```
+
+
+
 #### 基础数据类型
 
 * Int, Float, Double
 * Bool
 * String
 
+
+
+代码示例
+
+```swift
+var x = 0.0, y = 0.0, z = 0.0
+
+var welcomeMessage: String
+welcomeMessage = "Hello"
+
+var red, green, blue: Double
+
+let π = 3.14159
+let 你好 = "你好世界"
+let 🐶🐮 = "dogcow"
+```
+
+
+
 #### 基本集合类型
 
 * Array
 * Set
 * Dictionary
+
+
+
+##### 数组
+
+```swift
+//数组的创建
+var someInts = [Int]()
+var threeDoubles = Array(repeating: 0.0, count: 3)
+var shoppingList: [String] = ["Eggs", "Milk"]		//数组字面量构造数组，也可写成 var shoppingList = ["Eggs", "Milk"]
+
+//数组的合并
+var anotherThreeDoubles = Array(repeating: 2.5, count: 3)
+var sixDoubles = threeDoubles + anotherThreeDoubles
+
+//数组的访问和修改
+//数组的个数 count
+sixDoubles.count
+
+//判断是否为空
+if shoppingList.isEmpty {
+    print("The shopping list is empty.")
+} else {
+    print("The shopping list is not empty.")
+}
+
+//数组的添加 append(_:)、+=
+shoppingList.append("Flour")
+
+shoppingList += ["Baking Powder"]		// shoppingList 现在有四项了
+shoppingList += ["Chocolate Spread", "Cheese", "Butter"]		// shoppingList 现在有七项了
+
+//数组读取、修改
+var firstItem = shoppingList[0]
+shoppingList[0] = "Six eggs"
+shoppingList[4...6] = ["Bananas", "Apples"]		//使用区间运算符
+
+//插入 insert(_:at:)
+shoppingList.insert("Maple Syrup", at: 0)
+
+//移除 remove(at:)、removeLast()
+let mapleSyrup = shoppingList.remove(at: 0)
+let apples = shoppingList.removeLast()		//移除数组最后一项
+
+
+//遍历
+//for-in, enumerated()
+for item in shoppingList {
+    print(item)
+}
+
+//需要索引，用 enumerated()
+for (index, value) in shoppingList.enumerated() {
+    print("Item \(String(index + 1)): \(value)")
+}
+
+```
+
+
 
 
 
