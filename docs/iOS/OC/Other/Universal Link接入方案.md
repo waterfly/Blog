@@ -17,9 +17,10 @@
 * Xcode配置Assocication，基本格式：
 
   ```objc
+  //注意，这里一定需要前缀，或者*.baidu.com
   applinks:www.baidu.com
-  ```
-
+```
+  
   
 
 ## HTTPS站点
