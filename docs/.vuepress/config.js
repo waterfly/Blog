@@ -42,6 +42,8 @@ module.exports = {
         './SwiftGG/SwiftGG_note_3',
         './EquatableHashableComparable',
         './String',
+        './SequenceAndCollectionProtocols',
+        './Sequence',
       ],
       '/iOS/RN/': [
         '',
@@ -64,6 +66,7 @@ module.exports = {
         './Other/导航栏TitleView不显示的问题',
         './Other/Xcode_GPX文件Mock真机系统定位',
         './Other/《禅与Objective-C编程艺术》阅读笔记',
+        './Other/UniversalLink',
       ],
       '/Web/': [
         '',     /* /foo/ */

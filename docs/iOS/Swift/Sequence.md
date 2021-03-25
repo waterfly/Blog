@@ -1,3 +1,16 @@
+---
+title: Sequence
+date: 2020-11-05 11:12:51
+sidebarDepth: 4
+categories: 
+ - iOS
+tags: 
+ - Swift
+---
+
+[[toc]]
+[toc]
+
 # Sequence
 
 ### IteratorProtocol
