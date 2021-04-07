@@ -89,7 +89,7 @@ var someInts = [Int]()
 var threeDoubles = Array(repeating: 0.0, count: 3)
 var shoppingList: [String] = ["Eggs", "Milk"]		//数组字面量构造数组，也可写成 var shoppingList = ["Eggs", "Milk"]
 
-//数组的合并
+//数组的合并 +、+=
 var anotherThreeDoubles = Array(repeating: 2.5, count: 3)
 var sixDoubles = threeDoubles + anotherThreeDoubles
 
@@ -137,6 +137,42 @@ for (index, value) in shoppingList.enumerated() {
 ```
 
 
+
+##### 字典
+
+```swift
+//创建,所有的Key必须是同一类型;所有的Value必须是同一类型
+var namesOfIntegers = [Int: String]()
+namesOfIntegers = [:]			//空字典字面量来创建一个空字典
+
+var airports: [String: String] = ["YYZ": "Toronto Pearson", "DUB": "Dublin"]
+
+//修改，updateValue(_:forKey:)；下标
+airports.updateValue("Dublin Airport", forKey: "DUB")
+airports["LHR"] = "London"
+
+//删除，removeValue(forKey:)；下标
+airports.removeValue(forKey: "DUB")
+airports["APL"] = nil
+
+//查询，
+airports["DUB"]
+airports.keys
+airports.values
+
+//遍历，for-in
+for (airportCode, airportName) in airports {
+    print("\(airportCode): \(airportName)")
+}
+for airportCode in airports.keys {
+    print("Airport code: \(airportCode)")
+}
+for airportName in airports.values {
+    print("Airport name: \(airportName)")
+}
+
+//判断，isEmpty；个数，count
+```
 
 
 
