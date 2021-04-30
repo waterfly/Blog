@@ -219,6 +219,20 @@ serverResponseCode = nil
 
 
 
+##### 可选类型与数组
+
+**集合类型的元素可以是可选类型**
+
+```swift
+//数组内元素可以是可选类型，即可以为nil
+var stack: [TreeNode?] = [root]
+if let node = stack.removeFirst() {
+  stack.insert(node.left, at: 0)
+}
+```
+
+
+
 ##### 强制解析
 
 确定可选变量一定有值，则可以对其进行强制解析，获取对应值，否则报错
